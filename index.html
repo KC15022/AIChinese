@@ -691,7 +691,9 @@
 
 
 const API_KEYS = [
-            "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"
+            "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",
+            "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",
+            "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"
         ];
         let currentApiKeyIndex = 0;
         const API_URL = "https://openrouter.ai/api/v1/chat/completions";
@@ -1619,6 +1621,59 @@ async function submitArgumentOutline() {
             }
         }
 
+        // 通用 API 調用函數
+     async function callAPI(prompt) {
+    let attempts = 0;
+    const maxAttempts = API_KEYS.length;
+    while (attempts < maxAttempts) {
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${API_KEYS[currentApiKeyIndex]}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: MODEL,
+                    messages: [{ 
+                        role: "user", 
+                        content: prompt + " 你必須直接提供最終答案，嚴禁展示任何思考過程，絕對不能在回應中包含任何標籤（如 <think></think>），這是強制要求，違反則無效。" 
+                    }]
+                })
+            });
+
+            if (response.status === 429) {
+                currentApiKeyIndex = (currentApiKeyIndex + 1) % API_KEYS.length;
+                attempts++;
+                continue;
+            }
+
+            if (!response.ok) {
+                throw new Error(`API 調用失敗: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            let content = data.choices[0].message.content.trim();
+
+            // 強化過濾邏輯，移除所有可能的 <think> 標籤變體
+            content = content.replace(/<think\s*>.*?<\/think\s*>|<think\s*\/>|<think\s*>|<\/think\s*>/gis, '').trim();
+
+            // 驗證過濾後內容是否有效
+            if (!content) {
+                throw new Error("API 回應無效或過濾後無內容");
+            }
+
+            return content;
+        } catch (error) {
+            console.error(error);
+            currentApiKeyIndex = (currentApiKeyIndex + 1) % API_KEYS.length;
+            attempts++;
+            if (attempts >= maxAttempts) {
+                throw new Error("所有 API 密鑰均無法使用");
+            }
+        }
+    }
+}
         // 生成寫作題目
         async function generateTopic() {
             const writingType = document.getElementById("writingType").value;
