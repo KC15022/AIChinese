@@ -347,77 +347,7 @@
     </h1>
 </div>
 
-<div id="hitokoto-container" class="box">
-    <div id="hitokoto"></div>
-    <button id="refresh-btn"><i class="fas fa-sync-alt"></i></button>
-</div>
 
-<style>
-    #hitokoto-container {
-        background: rgba(220, 220, 220, 0.96);
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        padding: 20px;
-        margin: 15px 0;
-        text-align: left;
-        max-width: 800px;
-    }
-
-    #hitokoto {
-        font-size: 16px;
-        font-style: italic;
-        color: #333;
-        margin-bottom: 4px;
-    }
-
-    #hitokoto p {
-        margin: 5px 0;
-    }
-
-    #refresh-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 20px;
-        color: #5d6d7e;
-        transition: color 0.3s;
-    }
-
-    #refresh-btn:hover {
-        color: #000;
-    }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const converter = OpenCC.Converter({ from: 'cn', to: 'tw' });
-        const hitokotoElement = document.getElementById('hitokoto');
-        const refreshBtn = document.getElementById('refresh-btn');
-
-        function fetchHitokoto() {
-            fetch('https://v1.hitokoto.cn/?c=d&encode=json')
-                .then(response => response.json())
-                .then(data => {
-                    const convertedHitokoto = converter(data.hitokoto);
-                    const convertedFrom = converter(data.from);
-                    hitokotoElement.innerHTML = `
-                        <p>${convertedHitokoto}</p>
-                        <p>—— 《${convertedFrom}》</p>
-                    `;
-                })
-                .catch(error => {
-                    console.error('獲取名言失敗:', error);
-                    hitokotoElement.innerHTML = '<p>獲取名言失敗，請稍後再試。</p>';
-                });
-        }
-
-        fetchHitokoto();
-        refreshBtn.addEventListener('click', fetchHitokoto);
-    });
-</script>
-
-    
    <!-- 工具功能概覽按鈕 -->
 <div class="box">
     <button id="toggleOverviewBtn" onclick="toggleOverview()">顯示「功能概覽」</button>
