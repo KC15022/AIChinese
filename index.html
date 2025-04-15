@@ -11,6 +11,39 @@
     <style>
 
 
+#container {
+            text-align: center;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #hitokoto {
+            font-size: 24px;
+            font-style: italic;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #hitokoto p {
+            margin: 5px 0;
+        }
+
+        #refresh-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: #666;
+        }
+
+        #refresh-btn:hover {
+            color: #000;
+        }
+
+        
+
         body {
             font-family: 'Noto Serif TC', 'cwTeXHei', 'cwTeXFangSong', 'cwTeXKai', 'cwTeXMing', 'PingFang TC', 'Microsoft JhengHei', serif;
             max-width: 800px;
@@ -130,39 +163,6 @@
             min-width: 150px;
         }
 
- #container {
-            text-align: center;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        #hitokoto {
-            font-size: 24px;
-            font-style: italic;
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        #hitokoto p {
-            margin: 5px 0;
-        }
-
-        #refresh-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 20px;
-            color: #666;
-        }
-
-        #refresh-btn:hover {
-            color: #000;
-        }
-
-
-        
 #toggleOverviewBtn {
             background-color: #A9A9A9; /* 灰色背景 */
             color: white; /* 白色文字 */
@@ -380,21 +380,21 @@
     </h1>
 </div>
 
-<div class="box">
-    
+
+    <div class="box">
     <title>名言佳句</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    
-<div id="container">
+         <div id="container">
         <div id="hitokoto"></div>
         <button id="refresh-btn"><i class="fas fa-sync-alt"></i></button>
     </div>
 
+
 </div>
 
-
     
+
    <!-- 工具功能概覽按鈕 -->
 <div class="box">
     <button id="toggleOverviewBtn" onclick="toggleOverview()">顯示「功能概覽」</button>
@@ -733,7 +733,37 @@
     
     <script>
 
+ document.addEventListener('DOMContentLoaded', function() {
+            const converter = OpenCC.Converter({ from: 'cn', to: 'tw' });
+            const hitokotoElement = document.getElementById('hitokoto');
+            const refreshBtn = document.getElementById('refresh-btn');
 
+            function fetchHitokoto() {
+                fetch('https://v1.hitokoto.cn/?c=d&encode=json')
+                    .then(response => response.json())
+                    .then(data => {
+                        const convertedHitokoto = converter(data.hitokoto);
+                        const convertedFrom = converter(data.from);
+                        hitokotoElement.innerHTML = `
+                            <p>${convertedHitokoto}</p>
+                            <p>—— 《${convertedFrom}》</p>
+                        `;
+                    })
+                    .catch(error => {
+                        console.error('獲取名言失敗:', error);
+                        hitokotoElement.innerHTML = '<p>獲取名言失敗，請稍後再試。</p>';
+                    });
+            }
+
+            // 初始加載
+            fetchHitokoto();
+
+            // 點擊重整按鈕
+            refreshBtn.addEventListener('click', fetchHitokoto);
+        });
+
+
+        
         // API 配置信息
         const API_KEYS = [
             "sk-sIQ80fS-WpUIP4xU9V-XMA"
@@ -828,38 +858,6 @@ const audio = document.getElementById('audio');
         musicPlayer.classList.remove('hidden');
         showPlayerBtn.style.display = 'none';
     });
-
-
- document.addEventListener('DOMContentLoaded', function() {
-            const converter = OpenCC.Converter({ from: 'cn', to: 'tw' });
-            const hitokotoElement = document.getElementById('hitokoto');
-            const refreshBtn = document.getElementById('refresh-btn');
-
-            function fetchHitokoto() {
-                fetch('https://v1.hitokoto.cn/?c=d&encode=json')
-                    .then(response => response.json())
-                    .then(data => {
-                        const convertedHitokoto = converter(data.hitokoto);
-                        const convertedFrom = converter(data.from);
-                        hitokotoElement.innerHTML = `
-                            <p>${convertedHitokoto}</p>
-                            <p>—— 《${convertedFrom}》</p>
-                        `;
-                    })
-                    .catch(error => {
-                        console.error('獲取名言失敗:', error);
-                        hitokotoElement.innerHTML = '<p>獲取名言失敗，請稍後再試。</p>';
-                    });
-            }
-
-            // 初始加載
-            fetchHitokoto();
-
-            // 點擊重整按鈕
-            refreshBtn.addEventListener('click', fetchHitokoto);
-        });
-
-
         
         // 預設寫作題目列表
         const topics = [
@@ -2411,6 +2409,10 @@ async function submitArgumentOutline() {
         window.onload = function() {
             showContainer("writingContainer");
         };
+
+<script src="https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/full.js">
+
+        
     </script>
 </body>
 </html>
