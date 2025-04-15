@@ -417,7 +417,7 @@
             const refreshBtn = document.getElementById('refresh-btn');
 
             function fetchHitokoto() {
-    fetch('https://v1.hitokoto.cn/?c=d&encode=json')
+    fetch('https://v1.hitokoto.cn/?c[]=d&c[]=i&c[]=k&encode=json')
         .then(response => response.json())
         .then(data => {
             const convertedHitokoto = converter(data.hitokoto);
